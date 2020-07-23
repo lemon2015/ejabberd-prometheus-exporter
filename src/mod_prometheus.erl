@@ -9,6 +9,8 @@
 %%%-------------------------------------------------------------------
 -author("Skythet").
 
+-include("ejabberd_sm.hrl").
+
 %% API
 -export([start/2,
   stop/1,
@@ -27,7 +29,8 @@
   port_count,
   port_limit,
   process_count,
-  process_limit
+  process_limit,
+  connected_users
 ]).
 
 start(_Host, _Opts) ->
@@ -59,7 +62,6 @@ statistics([], _) ->
 statistics([StatName | StatsTail], Node) ->
   [statistic(StatName, Node), statistics(StatsTail, Node)].
 
-
 statistic(reductions, Node) ->
   {TotalReductions, ReductionsSinceLastCall} = erlang:statistics(reductions),
   [
@@ -88,19 +90,23 @@ statistic(context_switches, Node) ->
   metric_format(context_switches, Node, ContextSwitches);
 
 statistic(Metric, Node) when
-    Metric == port_count;
-    Metric == port_limit;
-    Metric == process_count;
-    Metric == process_limit
+  Metric == port_count;
+  Metric == port_limit;
+  Metric == process_count;
+  Metric == process_limit
   ->
   metric_format(Metric, Node, erlang:system_info(Metric));
 
 statistic(allocated_areas, Node) ->
   allocated_areas_metrics(erlang:system_info(allocated_areas), Node);
 
+%% connected users number
+statistic(connected_users, Node) ->
+  ConnectedUsers = ejabberd_sm:connected_users_number(),
+  metric_format("connected_users", Node, ConnectedUsers);
+
 statistic(StatName, Node) ->
   metric_format(StatName, Node, erlang:statistics(StatName)).
-
 
 allocated_areas_metrics([], _) ->
   [];
