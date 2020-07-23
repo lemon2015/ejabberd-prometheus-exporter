@@ -18,9 +18,9 @@ Add config to `ejabberd.yml`:
         request_handlers:
           "/metrics": mod_prometheus
 
-Reload config or restart ejabberd:
+Restart ejabberd:
 
-  `ejabberdctl reload_config` or `ejabberdctl restart` 
+ `ejabberdctl restart` 
   
 Test metrics:
 
