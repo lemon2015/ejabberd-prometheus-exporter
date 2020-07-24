@@ -9,8 +9,6 @@
 %%%-------------------------------------------------------------------
 -author("Skythet").
 
--include("ejabberd_sm.hrl").
-
 %% API
 -export([start/2,
   stop/1,
@@ -30,7 +28,8 @@
   port_limit,
   process_count,
   process_limit,
-  connected_users
+  connected_users,
+  registered_users
 ]).
 
 start(_Host, _Opts) ->
@@ -104,6 +103,16 @@ statistic(allocated_areas, Node) ->
 statistic(connected_users, Node) ->
   ConnectedUsers = ejabberd_sm:connected_users_number(),
   metric_format("connected_users", Node, ConnectedUsers);
+
+%% registered users number
+statistic(registered_users, Node) ->
+  Hosts = ejabberd_config:get_myhosts(),
+  UsersList = lists:map(
+    fun(Host) ->
+      ejabberd_auth:count_users(Host)
+    end, Hosts),
+  UsersCount = lists:sum(UsersList),
+  metric_format("registered_users", Node, UsersCount);
 
 statistic(StatName, Node) ->
   metric_format(StatName, Node, erlang:statistics(StatName)).

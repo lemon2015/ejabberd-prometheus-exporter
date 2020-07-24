@@ -44,3 +44,4 @@ Support Metrics List:
 * process_count
 * process_limit
 * connected_users
+* registered_users
