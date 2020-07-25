@@ -29,7 +29,8 @@
   process_count,
   process_limit,
   connected_users,
-  registered_users
+  registered_users,
+  muc_online_rooms
 ]).
 
 start(_Host, _Opts) ->
@@ -113,6 +114,17 @@ statistic(registered_users, Node) ->
     end, Hosts),
   UsersCount = lists:sum(UsersList),
   metric_format("registered_users", Node, UsersCount);
+
+%% muc online rooms
+statistic(muc_online_rooms, Node) ->
+  Hosts = ejabberd_config:get_myhosts(),
+  MucList = lists:map(
+    fun(Host) ->
+      RoomHost = list_to_binary(["conference.",binary_to_list(Host)]),
+      mod_muc:count_online_rooms(RoomHost)
+    end, Hosts),
+  MC = lists:sum(MucList),
+  metric_format("muc_online_rooms", Node, MC);
 
 statistic(StatName, Node) ->
   metric_format(StatName, Node, erlang:statistics(StatName)).

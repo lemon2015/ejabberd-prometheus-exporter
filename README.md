@@ -45,3 +45,4 @@ Support Metrics List:
 * process_limit
 * connected_users
 * registered_users
+* muc_online_rooms
