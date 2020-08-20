@@ -30,7 +30,8 @@
   process_limit,
   connected_users,
   registered_users,
-  muc_online_rooms
+  muc_online_rooms,
+  nodes_number
 ]).
 
 start(_Host, _Opts) ->
@@ -100,6 +101,10 @@ statistic(Metric, Node) when
 statistic(allocated_areas, Node) ->
   allocated_areas_metrics(erlang:system_info(allocated_areas), Node);
 
+%% nodes numbers
+statistic(nodes_number, Node) ->
+  metric_format(nodes_number, Node, length(ejabberd_cluster:get_nodes()));
+
 %% connected users number
 statistic(connected_users, Node) ->
   ConnectedUsers = ejabberd_sm:connected_users_number(),
@@ -115,7 +120,7 @@ statistic(registered_users, Node) ->
   UsersCount = lists:sum(UsersList),
   metric_format("registered_users", Node, UsersCount);
 
-%% muc online rooms
+%% muc online rooms  todo ensure enabled mod_muc
 statistic(muc_online_rooms, Node) ->
   Hosts = ejabberd_config:get_myhosts(),
   MucList = lists:map(
